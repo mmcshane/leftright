@@ -29,12 +29,12 @@ namespace mpm
     //! R, an implementation of the ReaderRegistry concept \n
     //! r, an instance of R
     //!
-    //! |Expression  | Requirements                                            | Return type                                      |
-    //! |:-----------|:--------------------------------------------------------|:-------------------------------------------------|
-    //! | R()        | R is default constructible                              | R                                                |
-    //! | r.arrive() | Notes the arival of a reader. wait-free and noexcept    |                                                  |
-    //! | r.depart() | Notes the departure of a reader. wait-free and noexcept |                                                  |
-    //! | r.empty()  | const and noexcept                                      | true if there are zero readers; false otherwise. |
+    //! |Expression  | Requirements                                             | Return type  |
+    //! |:-----------|:---------------------------------------------------------|:-------------|
+    //! | R()        | R is default constructible.                              | R            |
+    //! | r.arrive() | Notes the arival of a reader. Wait-free and noexcept.    | void         |
+    //! | r.depart() | Notes the departure of a reader. Wait-free and noexcept. | void         |
+    //! | r.empty()  | const and noexcept.    | true if there are no readers; false otherwise. |
     //! \}
 
     struct in_place_t {};
