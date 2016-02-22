@@ -9,6 +9,11 @@
 #include <thread>
 #include <type_traits>
 
+
+#ifndef MPM_LEFTRIGHT_CACHE_LINE_SIZE
+#   define MPM_LEFTRIGHT_CACHE_LINE_SIZE 64
+#endif
+
 namespace mpm
 {
     //! \defgroup Concepts
@@ -92,8 +97,11 @@ namespace mpm
             noexcept(std::is_nothrow_copy_constructible<T>::value
                     && std::is_nothrow_constructible<T, Args...>::value);
 
-        // I think all of these are implementable but I'm just focusing
-        // on the basics right now.
+        //! \internal
+        //!  Need a use-case for these. It seems that you would never want to
+        //!  move/copy/swap the full leftright instance but rather apply those
+        //!  operations to the encapsulated instance, in which case the relevant
+        //!  operation is accessed via modify()
 
         basic_leftright(const basic_leftright& other)=delete;
         basic_leftright(basic_leftright&& other)=delete;
@@ -164,8 +172,8 @@ namespace mpm
 
         std::atomic<lr> m_leftright { read_left };
 
-        T m_left alignas(64);
-        T m_right alignas(64);
+        T m_left alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE);
+        T m_right alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE);
         std::mutex m_writemutex;
     };
 
@@ -176,7 +184,7 @@ namespace mpm
     //! on a single cache line due to the use of a shared counter.
     //!
     //! \concept{ReaderRegistry}
-    class alignas(64) atomic_reader_registry
+    class alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE) atomic_reader_registry
     {
       public:
         void arrive() noexcept;
@@ -200,7 +208,7 @@ namespace mpm
     //!
     //! \concept{ReaderRegistry}
     template <std::size_t N, typename Hasher=std::hash<std::thread::id>>
-    class alignas(64) distributed_atomic_reader_registry
+    class alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE) distributed_atomic_reader_registry
     {
       public:
         void arrive() noexcept;
@@ -208,7 +216,7 @@ namespace mpm
         bool empty() const noexcept;
 
       private:
-        class alignas(64) counter
+        class alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE) counter
         {
           public:
             void incr() noexcept;
