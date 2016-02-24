@@ -23,7 +23,7 @@ namespace mpm
     //! \ingroup Concepts
     //! \{
     //!
-    //! Keeps track of active readers such that it can effeciently
+    //! Keeps track of active readers such that it can efficiently
     //! indicate whether there are any active readers when queried.
     //!
     //! \par Extends
