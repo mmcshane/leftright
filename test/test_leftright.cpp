@@ -1,4 +1,4 @@
-#include <mpm/leftright.hpp>
+#include <mpm/leftright.h>
 #include <map>
 #include <string>
 #include <catch.hpp>
