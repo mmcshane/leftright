@@ -42,7 +42,8 @@ namespace mpm
     //! | r.empty()  | const and noexcept.    | true if there are no readers; false otherwise. |
     //! \}
 
-    constexpr struct in_place_t { } in_place { };
+    struct in_place_t { };
+    constexpr in_place_t in_place { };
 
     //! Wrap any single-threaded datastructure with Left-Right
     //! concurrency control
