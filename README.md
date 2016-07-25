@@ -36,10 +36,8 @@ There's really no build needed as this is a header-only library, however if you
 want to run the unit tests or generate docs you can use the cmake build. To
 perform an out-of-tree build
 
-    $ cd /tmp # or wherever
-    $ mkdir leftright-debug
-    $ cd leftright-debug
+    $ cd "$(mktemp -d)"
     $ cmake -DCMAKE_BUILD_TYPE=debug /path/to/leftright/repository
     $ make && make test
-    $ make docs # generates doxygen documentation under /tmp/leftright-debug/docs
+    $ make docs # generates doxygen documentation under docs/
     
