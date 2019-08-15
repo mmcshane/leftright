@@ -1,7 +1,7 @@
 #include <mpm/leftright.h>
 #include <map>
 #include <string>
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 
 TEST_CASE("in-place construct", "[mpm.leftright]")
