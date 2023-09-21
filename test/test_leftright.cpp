@@ -1,6 +1,6 @@
 #include <mpm/leftright.h>
+#include <atomic>
 #include <map>
-#include <string>
 #include <catch2/catch.hpp>
 
 
@@ -77,6 +77,48 @@ TEST_CASE("noexcept specs", "[mpm.leftright]")
     // functors that are declared noexcept
     //auto null_modifier = [](lrint::reference i){ return i; };
     //CHECK(0 == lri.modify(null_modifier));
+}
+TEST_CASE("hammer it", "[mpm.leftright]")
+{
+    // repro of https://github.com/mmcshane/leftright/issues/3
+
+    // this test may require compiler optimizations (e.g. -O3) to fail as
+    // expected. To induce failure, change the memory order used in the stores
+    // to basic_leftright::m_leftright performed in the two branches of
+    // basic_leftright::modify to std::memory_order_release.
+
+    struct Bigish {
+      public:
+        void add1() { a1 += 1; a2 += 1; a3 += 1; a4 += 1; }
+
+        alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE) int a1 = 0;
+        alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE) int a2 = 0;
+        alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE) int a3 = 0;
+        alignas(MPM_LEFTRIGHT_CACHE_LINE_SIZE) int a4 = 0;
+    };
+
+    mpm::leftright<Bigish> lrb{};
+
+    std::atomic_uint_fast32_t violations{0};
+    std::thread reader([&] {
+        for(int i = 0; i < 10000000; i++) {
+            auto observed = lrb.observe([](const Bigish& val) noexcept{ return val; });
+            auto a1 = observed.a1;
+            if (observed.a2 != a1 || observed.a3 != a1 || observed.a4 != a1) {
+                violations.fetch_add(1, std::memory_order_relaxed);
+            }
+        }
+    });
+
+    Bigish in{};
+    for(int i = 0; i < 10000000; i++){
+        in.add1();
+        lrb.modify([&](Bigish& b)noexcept{ b = in; });
+    }
+
+    reader.join();
+
+    CHECK(0 == violations.load(std::memory_order_relaxed));
 }
 
 /*

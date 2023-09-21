@@ -37,7 +37,9 @@ want to run the unit tests or generate docs you can use the cmake build. To
 perform an out-of-tree build
 
     $ cd "$(mktemp -d)"
-    $ cmake -DCMAKE_BUILD_TYPE=debug /path/to/leftright/repository
+    $ cmake -DCMAKE_BUILD_TYPE=release /path/to/leftright/repository
     $ make && make test
     $ make docs # generates doxygen documentation under docs/
     
+Use of release builds is suggested here as optimizations are more likely to
+trigger concurrency bugs.

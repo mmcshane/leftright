@@ -291,14 +291,14 @@ namespace mpm
         if(read_left == m_leftright.load(std::memory_order_relaxed))
         {
             f(m_right);
-            m_leftright.store(read_right, std::memory_order_release);
+            m_leftright.store(read_right, std::memory_order_seq_cst);
             toggle_reader_registry(xlock);
             return f(m_left);
         }
         else
         {
             f(m_left);
-            m_leftright.store(read_left, std::memory_order_release);
+            m_leftright.store(read_left, std::memory_order_seq_cst);
             toggle_reader_registry(xlock);
             return f(m_right);
         }
